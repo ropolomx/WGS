@@ -154,4 +154,4 @@ rule prokka:
         prefix='{sample}',
         outdir='{sample}/{sample}_prokka'
     shell:
-        'prokka --kingdom Bacteria --prefix {params.prefix} --outdir {params.outdir} --cpus 40 --force {input}'
+        'prokka --kingdom Bacteria --prefix {params.prefix} --outdir {params.outdir} --cpus 12 --force {input}'
