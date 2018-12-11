@@ -9,3 +9,5 @@ Tutorials and resources for whole genome sequence analysis based on Next Generat
 _Tarah Lynch, Aaron Petkau, Natalie Knox, Morag Graham, Gary Van Domselaar_
 
 Clin Microbiol Rev 29:881–913. doi:10.1128/CMR.00001-16.
+
+[Slideshare presentations by Torsten Seemann](https://www.slideshare.net/torstenseemann/presentations)
