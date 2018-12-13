@@ -39,6 +39,8 @@ rule all:
         expand('{sample}/abricate_plasmid.txt', sample=SAMPLE),
         expand('{sample}/abricate_ecoh.txt', sample=SAMPLE),
         expand('{sample}/abricate_ecolivf.txt', sample=SAMPLE),
+        expand('{sample}/ariba_virfinder/assemblies.fa.gz', sample=SAMPLE),
+        expand('{sample}/ariba_virfinder/report.tsv', sample=SAMPLE),
         'ecoh_summary.txt',
         'amr_summary.txt',
         'vf_summary.txt',
@@ -155,3 +157,16 @@ rule prokka:
         outdir='{sample}/{sample}_prokka'
     shell:
         'prokka --kingdom Bacteria --prefix {params.prefix} --outdir {params.outdir} --cpus 12 --force {input}'
+
+rule ariba_run:
+    input:
+        fwd='{sample}_fwd_trimmed.fastq.gz',
+        rev='{sample}_rev_trimmed.fastq.gz'
+    output:
+        gz='{sample}/ariba_virfinder/assemblies.fa.gz',
+        rep='{sample}/ariba_virfinder/report.tsv'
+    params:
+        ariba_db = '/media/amr_storage/ariba_ref/virfinder',
+        ariba_out = '{sample}/ariba_virfinder'
+    shell:
+        'ariba run --threads 12 {params.ariba_db} {input.fwd} {input.rev} --force {params.ariba_out}'
