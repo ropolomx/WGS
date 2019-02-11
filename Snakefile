@@ -1,33 +1,4 @@
-#configfile: 'config.yaml'
 
-#SAMPLE = config['samples']
-
-SAMPLE = [
-"11_S2",
-"12_S3",
-"14_S4",
-"15_S5",
-"22_S6",
-"25_S7",
-"30_S4",
-"32_S5",
-"37_S1",
-"38_S2",
-"3_S1",
-"42_S3",
-"50_S10",
-"56_S6",
-"60_S11",
-"64_S7",
-"65_S8",
-"67_S9",
-"68_S10",
-"69_S11",
-"72_S12",
-"76_S13",
-"77_S8",
-"80_S9"
-]
 
 FWD = expand('{sample}/{sample}_unmapped_fwd.fastq', sample=SAMPLE)
 REV = expand('{sample}/{sample}_unmapped_rev.fastq', sample=SAMPLE)
