@@ -1,4 +1,6 @@
+configfile: "config.yaml"
 
+SAMPLE = pd.read_table(config["samples"].set_index("samples", drop=False)
 
 FWD = expand('{sample}/{sample}_unmapped_fwd.fastq', sample=SAMPLE)
 REV = expand('{sample}/{sample}_unmapped_rev.fastq', sample=SAMPLE)
@@ -19,8 +21,8 @@ rule all:
 
 rule trimmomatic:
     input:
-        fwd='{sample}_L001_R1.fastq.gz',
-        rev='{sample}_L001_R2.fastq.gz'
+        fwd=lambda wilcards: SAMPLE.loc[wilcards.sample, 'forward'],
+        rev=lambda wilcards: SAMPLE.loc[wilcards.sample, 'reverse'],
 
     output:
         fwd_paired='{sample}_fwd_trimmed.fastq.gz',
@@ -38,8 +40,8 @@ rule shovill:
         rev='{sample}_rev_trimmed.fastq.gz'
 
     output:
-        '{sample}/{sample}_shovill/contigs.fa',
-        '{sample}/{sample}_shovill/contigs.gfa'
+        contigs='{sample}/{sample}_shovill/contigs.fa',
+        graph='{sample}/{sample}_shovill/contigs.gfa'
     params:
         dir='{sample}/{sample}_shovill'
     shell:
@@ -135,6 +137,17 @@ rule ariba_run:
         rev='{sample}_rev_trimmed.fastq.gz'
     output:
         gz='{sample}/ariba_virfinder/assemblies.fa.gz',
+        rep='{sample}/ariba_virfinder/report.tsv'
+    params:
+        ariba_db = '/media/amr_storage/ariba_ref/virfinder',
+        ariba_out = '{sample}/ariba_virfinder'
+    shell:
+        'ariba run --threads 12 {params.ariba_db} {input.fwd} {input.rev} --force {params.ariba_out}'
+
+rule mlst:
+    input:
+	'{sample}/{sample}_shovill/contigs.fa'
+    output:
         rep='{sample}/ariba_virfinder/report.tsv'
     params:
         ariba_db = '/media/amr_storage/ariba_ref/virfinder',
