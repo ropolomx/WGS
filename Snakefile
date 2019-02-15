@@ -1,8 +1,8 @@
 import pandas as pd
 
-configfile: "config.yaml"
+configfile: 'config.yaml'
 
-SAMPLE = pd.read_table(config["samples"].set_index("samples", drop=False)
+SAMPLE = pd.read_table(config['samples'], index_col='samples')
 
 rule all:
     input:
@@ -37,7 +37,7 @@ rule trimmomatic:
 
     output:
         fwd_paired='{sample}/{sample}_fwd_trimmed.fastq.gz',
-        rev_paired='{sample}_rev_trimmed.fastq.gz'
+        rev_paired='{sample}/{sample}_rev_trimmed.fastq.gz'
 
     log:
         'logs/trimmomatic/{sample}.log'
@@ -145,18 +145,18 @@ rule prokka:
     input:
         '{sample}/contigs.fa'
     output:
-        function='{sample}/{sample}_prokka/{sample}.ffn',
-        amino='{sample}/{sample}_prokka/{sample}.faa',
-        nucl='{sample}/{sample}_prokka/{sample}.fna',
-        fsa='{sample}/{sample}_prokka/{sample}.fsa',
-        genbank='{sample}/{sample}_prokka/{sample}.gbk',
-        gff='{sample}/{sample}_prokka/{sample}.gff',
-        sqn='{sample}/{sample}_prokka/{sample}.sqn',
-        tbl='{sample}/{sample}_prokka/{sample}.tbl',
-        tsv='{sample}/{sample}_prokka/{sample}.tsv',
-        summary='{sample}/{sample}_prokka/{sample}.txt',
-        error='{sample}/{sample}_prokka/{sample}.err',
-        log='{sample}/{sample}_prokka/{sample}.log'
+#        function='{sample}/{sample}_prokka/{sample}.ffn',
+#        amino='{sample}/{sample}_prokka/{sample}.faa',
+#        nucl='{sample}/{sample}_prokka/{sample}.fna',
+#        fsa='{sample}/{sample}_prokka/{sample}.fsa',
+#        genbank='{sample}/{sample}_prokka/{sample}.gbk',
+#        gff='{sample}/{sample}_prokka/{sample}.gff',
+#        sqn='{sample}/{sample}_prokka/{sample}.sqn',
+#        tbl='{sample}/{sample}_prokka/{sample}.tbl',
+#        tsv='{sample}/{sample}_prokka/{sample}.tsv',
+#        summary='{sample}/{sample}_prokka/{sample}.txt',
+#        error='{sample}/{sample}_prokka/{sample}.err',
+#        log_file='{sample}/{sample}_prokka/{sample}.log'
     params:
         prefix='{sample}',
         outdir='{sample}/{sample}_prokka'
@@ -176,10 +176,10 @@ rule prokka:
 #    shell:
 #        'ariba run --threads 12 {params.ariba_db} {input.fwd} {input.rev} --force {params.ariba_out}'
 
-rule mlst:
-    input:
-	'{sample}/contigs.fa'
-    output:
-        '{sample}/mlst.txt'
-    shell:
-        'mlst --threads 4 {input} > {output}'
+#rule mlst:
+#    input:
+#        '{sample}/contigs.fa'
+#    output:
+#        '{sample}/mlst.txt'
+#    shell:
+#        'mlst --threads 4 {input} > {output}'
