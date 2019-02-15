@@ -14,8 +14,10 @@
     {
         "cpus-per-task" : 32,
         "memory" : "16GB"
+    },
+    "roary" :
+    {
+        "cpus-per-task" : 32,
+        "memory" : "32GB"
     }
 }
-
-
-
