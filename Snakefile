@@ -168,7 +168,7 @@ rule mlst:
 
 rule pangenome:
     input:
-        'expand({sample}/prokka/{sample}.gff, sample=SAMPLE.isolate)'
+        expand('{sample}/prokka/{sample}.gff', sample=SAMPLE.isolate)
     output:
         pan='roary/gene_presence_absence.csv'
     shell:
