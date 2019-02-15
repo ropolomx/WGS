@@ -2,61 +2,45 @@ import pandas as pd
 
 configfile: 'config.yaml'
 
-SAMPLE = pd.read_csv(config["samples"]).set_index("isolate", drop=False)
+SAMPLE = pd.read_table(config["samples"]).set_index("isolate", drop=False)
 
 rule all:
     input:
-        expand('{sample}/{sample}_prokka/{sample}.ffn', sample=SAMPLE.isolate),
-        expand('{sample}/{sample}_prokka/{sample}.faa', sample=SAMPLE.isolate),
-        expand('{sample}/{sample}_prokka/{sample}.fna', sample=SAMPLE.isolate),
-        expand('{sample}/{sample}_prokka/{sample}.fsa', sample=SAMPLE.isolate),
-        expand('{sample}/{sample}_prokka/{sample}.gbk', sample=SAMPLE.isolate),
-        expand('{sample}/{sample}_prokka/{sample}.gff', sample=SAMPLE.isolate),
-        expand('{sample}/{sample}_prokka/{sample}.sqn', sample=SAMPLE.isolate),
-        expand('{sample}/{sample}_prokka/{sample}.tbl', sample=SAMPLE.isolate),
-        expand('{sample}/{sample}_prokka/{sample}.tsv', sample=SAMPLE.isolate),
-        expand('{sample}/{sample}_prokka/{sample}.txt', sample=SAMPLE.isolate),
-        expand('{sample}/{sample}_prokka/{sample}.err', sample=SAMPLE.isolate),
-        expand('{sample}/{sample}_prokka/{sample}.log', sample=SAMPLE.isolate),
-        expand('{sample}/abricate_amr.txt', sample=SAMPLE.isolate),
-        expand('{sample}/abricate_plasmid.txt', sample=SAMPLE.isolate),
-        expand('{sample}/mlst.txt', sample=SAMPLE.isolate),
-        #expand('{sample}/abricate_ecoh.txt', sample=SAMPLE.isolate),
-        #expand('{sample}/abricate_ecolivf.txt', sample=SAMPLE.isolate),
-        #expand('{sample}/ariba_virfinder/assemblies.fa.gz', sample=SAMPLE.isolate),
-        #expand('{sample}/ariba_virfinder/report.tsv', sample=SAMPLE.isolate),
+        expand('{sample}/prokka/{sample}.ffn', sample=SAMPLE['isolate']),
+        expand('{sample}/prokka/{sample}.faa', sample=SAMPLE['isolate']),
+        expand('{sample}/prokka/{sample}.fna', sample=SAMPLE['isolate']),
+        expand('{sample}/prokka/{sample}.fsa', sample=SAMPLE['isolate']),
+        expand('{sample}/prokka/{sample}.gbk', sample=SAMPLE['isolate']),
+        expand('{sample}/prokka/{sample}.gff', sample=SAMPLE['isolate']),
+        expand('{sample}/prokka/{sample}.sqn', sample=SAMPLE['isolate']),
+        expand('{sample}/prokka/{sample}.tbl', sample=SAMPLE['isolate']),
+        expand('{sample}/prokka/{sample}.tsv', sample=SAMPLE['isolate']),
+        expand('{sample}/prokka/{sample}.txt', sample=SAMPLE['isolate']),
+        expand('{sample}/prokka/{sample}.err', sample=SAMPLE['isolate']),
+        expand('{sample}/prokka/{sample}.log', sample=SAMPLE['isolate']),
+        expand('{sample}/abricate_amr.txt', sample=SAMPLE['isolate']),
+        expand('{sample}/abricate_plasmid.txt', sample=SAMPLE['isolate']),
+        expand('{sample}/mlst.txt', sample=SAMPLE['isolate']),
+        #expand('{sample}/abricate_ecoh.txt', sample=SAMPLE['isolate']),
+        #expand('{sample}/abricate_ecolivf.txt', sample=SAMPLE['isolate']),
+        #expand('{sample}/ariba_virfinder/assemblies.fa.gz', sample=SAMPLE['isolate']),
+        #expand('{sample}/ariba_virfinder/report.tsv', sample=SAMPLE['isolate']),
         #'ecoh_summary.txt',
         'amr_summary.txt',
         'vf_summary.txt',
         'plasmid_summary.txt'
 
-rule trimmomatic:
-    input:
-        forward=lambda wilcards: SAMPLE.loc[wilcards.sample, 'forward'],
-        reverse=lambda wilcards: SAMPLE.loc[wilcards.sample, 'reverse']
-
-    output:
-        fwd_paired='{sample}_fwd_trimmed.fastq.gz',
-        rev_paired='{sample}_rev_trimmed.fastq.gz'
-
-    log:
-        'logs/trimmomatic/{sample}.log'
-
-    shell:
-        '(trimmomatic PE -threads 12 -phred33 {input.fwd} {input.rev} {output.fwd_paired} /dev/null {output.rev_paired} /dev/null ILLUMINACLIP:/home/rodrigo/miniconda3/envs/wgs/share/trimmomatic-0.38-1/adapters/NexteraPE-PE.fa:1:25:11 LEADING:10 TRAILING:10 MINLEN:80) 2> {log}'
-
 rule shovill:
     input:
-        fwd='{sample}/{sample}_fwd_trimmed.fastq.gz',
-        rev='{sample}/{sample}_rev_trimmed.fastq.gz'
-
+        forward=lambda wildcards: SAMPLE.loc[wildcards.sample, 'forward'],
+        reverse=lambda wildcards: SAMPLE.loc[wildcards.sample, 'reverse']
     output:
         contigs='{sample}/contigs.fa',
         graph='{sample}/contigs.gfa'
     params:
         dir='{sample}'
     shell:
-        'shovill --outdir {params.dir} --ram 32 --cpus 8 --R1 {input.fwd} --R2 {input.rev} --trim --force'
+        'shovill --outdir {params.dir} --ram 32 --cpus 32 --R1 {input.forward} --R2 {input.reverse} --trim --force'
 
 rule abricate_amr:
     input:
@@ -78,9 +62,6 @@ rule abricate_plasmid:
     shell:
         '(abricate --threads 4 --mincov 60 --db plasmidfinder {input} > {output}) 2> {log}'
 
-
-#rule abricate_serotyping:
-#    input:
 #        '{sample}/contigs.fa'
 #    output:
 #        '{sample}/abricate_ecoh.txt'
@@ -119,7 +100,7 @@ rule abricate_vf:
 
 rule abricate_amr_summary:
     input:
-        expand('{sample}/abricate_amr.txt', sample=SAMPLE)
+        expand('{sample}/abricate_amr.txt', sample=SAMPLE.isolate)
     output:
         'amr_summary.txt'
     shell:
@@ -127,7 +108,7 @@ rule abricate_amr_summary:
 
 rule abricate_vf_summary:
     input:
-        expand('{sample}/abricate_ecolivf.txt', sample=SAMPLE)
+        expand('{sample}/abricate_vf.txt', sample=SAMPLE.isolate)
     output:
         'vf_summary.txt'
     shell:
@@ -135,7 +116,7 @@ rule abricate_vf_summary:
 
 rule abricate_plasmid_summary:
     input:
-        expand('{sample}/abricate_plasmid.txt', sample=SAMPLE)
+        expand('{sample}/abricate_plasmid.txt', sample=SAMPLE.isolate)
     output:
         'plasmid_summary.txt'
     shell:
@@ -145,21 +126,21 @@ rule prokka:
     input:
         '{sample}/contigs.fa'
     output:
-#        function='{sample}/{sample}_prokka/{sample}.ffn',
-#        amino='{sample}/{sample}_prokka/{sample}.faa',
-#        nucl='{sample}/{sample}_prokka/{sample}.fna',
-#        fsa='{sample}/{sample}_prokka/{sample}.fsa',
-#        genbank='{sample}/{sample}_prokka/{sample}.gbk',
-#        gff='{sample}/{sample}_prokka/{sample}.gff',
-#        sqn='{sample}/{sample}_prokka/{sample}.sqn',
-#        tbl='{sample}/{sample}_prokka/{sample}.tbl',
-#        tsv='{sample}/{sample}_prokka/{sample}.tsv',
-#        summary='{sample}/{sample}_prokka/{sample}.txt',
-#        error='{sample}/{sample}_prokka/{sample}.err',
-#        log_file='{sample}/{sample}_prokka/{sample}.log'
+        function='{sample}/prokka/{sample}.ffn',
+        amino='{sample}/prokka/{sample}.faa',
+        nucl='{sample}/prokka/{sample}.fna',
+        fsa='{sample}/prokka/{sample}.fsa',
+        genbank='{sample}/prokka/{sample}.gbk',
+        gff='{sample}/prokka/{sample}.gff',
+        sqn='{sample}/prokka/{sample}.sqn',
+        tbl='{sample}/prokka/{sample}.tbl',
+        tsv='{sample}/prokka/{sample}.tsv',
+        summary='{sample}/prokka/{sample}.txt',
+        error='{sample}/prokka/{sample}.err',
+        log_file='{sample}/prokka/{sample}.log'
     params:
         prefix='{sample}',
-        outdir='{sample}/{sample}_prokka'
+        outdir='{sample}/prokka'
     shell:
         'prokka --kingdom Bacteria --prefix {params.prefix} --outdir {params.outdir} --cpus 32 --force {input}'
 
@@ -176,10 +157,10 @@ rule prokka:
 #    shell:
 #        'ariba run --threads 12 {params.ariba_db} {input.fwd} {input.rev} --force {params.ariba_out}'
 
-#rule mlst:
-#    input:
-#        '{sample}/contigs.fa'
-#    output:
-#        '{sample}/mlst.txt'
-#    shell:
-#        'mlst --threads 4 {input} > {output}'
+rule mlst:
+    input:
+        '{sample}/contigs.fa'
+    output:
+        '{sample}/mlst.txt'
+    shell:
+        'mlst --threads 4 {input} > {output}'
