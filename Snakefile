@@ -2,7 +2,7 @@ import pandas as pd
 
 configfile: 'config.yaml'
 
-SAMPLE = pd.read_table(config['samples'], index_col='samples')
+SAMPLE = pd.read_table(config["samples"]).set_index("samples", drop=False)
 
 rule all:
     input:
@@ -47,8 +47,8 @@ rule trimmomatic:
 
 rule shovill:
     input:
-        fwd='{sample}_fwd_trimmed.fastq.gz',
-        rev='{sample}_rev_trimmed.fastq.gz'
+        fwd='{sample}/{sample}_fwd_trimmed.fastq.gz',
+        rev='{sample}/{sample}_rev_trimmed.fastq.gz'
 
     output:
         contigs='{sample}/contigs.fa',
@@ -60,7 +60,7 @@ rule shovill:
 
 rule abricate_amr:
     input:
-        '{sample}/{sample}_shovill/contigs.fa'
+        '{sample}/contigs.fa'
     output:
         '{sample}/abricate_amr.txt'
     log:
@@ -70,7 +70,7 @@ rule abricate_amr:
 
 rule abricate_plasmid:
     input:
-        '{sample}/{sample}_shovill/contigs.fa'
+        '{sample}/contigs.fa'
     output:
         '{sample}/abricate_plasmid.txt'
     log:
@@ -81,7 +81,7 @@ rule abricate_plasmid:
 
 #rule abricate_serotyping:
 #    input:
-#        '{sample}/{sample}_shovill/contigs.fa'
+#        '{sample}/contigs.fa'
 #    output:
 #        '{sample}/abricate_ecoh.txt'
 #    log:
@@ -91,7 +91,7 @@ rule abricate_plasmid:
 
 #rule abricate_ecolivf:
 #    input:
-#        '{sample}/{sample}_shovill/contigs.fa'
+#        '{sample}/contigs.fa'
 #    output:
 #        '{sample}/abricate_ecolivf.txt'
 #    log:
@@ -107,7 +107,7 @@ rule abricate_vf:
     log:
         'logs/abricate_vf/{sample}.log'
     shell:
-        '(abricate --threads 4 --mincov 60 --db ecoli_vf {input} > {output}) 2> {log}'
+        '(abricate --threads 4 --mincov 60 --db vfdb {input} > {output}) 2> {log}'
 
 #rule abricate_ecoh_summary:
 #    input:
