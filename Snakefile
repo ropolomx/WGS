@@ -1,9 +1,8 @@
+import pandas as pd
+
 configfile: "config.yaml"
 
 SAMPLE = pd.read_table(config["samples"].set_index("samples", drop=False)
-
-#FWD = expand('{sample}/{sample}_unmapped_fwd.fastq', sample=SAMPLE)
-#REV = expand('{sample}/{sample}_unmapped_rev.fastq', sample=SAMPLE)
 
 rule all:
     input:
@@ -21,6 +20,7 @@ rule all:
 	expand('{sample}/{sample}_prokka/{sample}.log', sample=SAMPLE),
         expand('{sample}/abricate_amr.txt', sample=SAMPLE),
         expand('{sample}/abricate_plasmid.txt', sample=SAMPLE),
+        expand('{sample}/mlst.txt', sample=SAMPLE),
         #expand('{sample}/abricate_ecoh.txt', sample=SAMPLE),
         #expand('{sample}/abricate_ecolivf.txt', sample=SAMPLE),
         #expand('{sample}/ariba_virfinder/assemblies.fa.gz', sample=SAMPLE),
@@ -33,7 +33,7 @@ rule all:
 rule trimmomatic:
     input:
         fwd=lambda wilcards: SAMPLE.loc[wilcards.sample, 'forward'],
-        rev=lambda wilcards: SAMPLE.loc[wilcards.sample, 'reverse'],
+        rev=lambda wilcards: SAMPLE.loc[wilcards.sample, 'reverse']
 
     output:
         fwd_paired='{sample}/{sample}_fwd_trimmed.fastq.gz',
@@ -145,18 +145,18 @@ rule prokka:
     input:
         '{sample}/contigs.fa'
     output:
-        '{sample}/{sample}_prokka/{sample}.ffn',
-	'{sample}/{sample}_prokka/{sample}.faa',
-	'{sample}/{sample}_prokka/{sample}.fna',
-	'{sample}/{sample}_prokka/{sample}.fsa',
-	'{sample}/{sample}_prokka/{sample}.gbk',
-	'{sample}/{sample}_prokka/{sample}.gff',
-	'{sample}/{sample}_prokka/{sample}.sqn',
-	'{sample}/{sample}_prokka/{sample}.tbl',
-	'{sample}/{sample}_prokka/{sample}.tsv',
-	'{sample}/{sample}_prokka/{sample}.txt',
-	'{sample}/{sample}_prokka/{sample}.err',
-	'{sample}/{sample}_prokka/{sample}.log'
+        function='{sample}/{sample}_prokka/{sample}.ffn',
+	amino='{sample}/{sample}_prokka/{sample}.faa',
+	nucl='{sample}/{sample}_prokka/{sample}.fna',
+	fsa='{sample}/{sample}_prokka/{sample}.fsa',
+	genbank='{sample}/{sample}_prokka/{sample}.gbk',
+	gff='{sample}/{sample}_prokka/{sample}.gff',
+	sqn='{sample}/{sample}_prokka/{sample}.sqn',
+	tbl='{sample}/{sample}_prokka/{sample}.tbl',
+	tsv='{sample}/{sample}_prokka/{sample}.tsv',
+	summary='{sample}/{sample}_prokka/{sample}.txt',
+	error='{sample}/{sample}_prokka/{sample}.err',
+	log='{sample}/{sample}_prokka/{sample}.log'
     params:
         prefix='{sample}',
         outdir='{sample}/{sample}_prokka'
@@ -180,9 +180,6 @@ rule mlst:
     input:
 	'{sample}/contigs.fa'
     output:
-        '{sample}/{sample}_mlst.txt'
-    params:
-        ariba_db = '/media/amr_storage/ariba_ref/virfinder',
-        ariba_out = '{sample}/ariba_virfinder'
+        '{sample}/mlst.txt'
     shell:
         'mlst --threads 4 {input} > {output}'
