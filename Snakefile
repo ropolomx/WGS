@@ -2,7 +2,7 @@ import pandas as pd
 
 configfile: 'config.yaml'
 
-SAMPLE = pd.read_table(config["samples"]).set_index("samples", drop=False)
+SAMPLE = pd.read_csv(config["samples"]).set_index("isolate", drop=False)
 
 rule all:
     input:
@@ -32,8 +32,8 @@ rule all:
 
 rule trimmomatic:
     input:
-        fwd=lambda wilcards: SAMPLE.loc[wilcards.sample, 'forward'],
-        rev=lambda wilcards: SAMPLE.loc[wilcards.sample, 'reverse']
+        forward=lambda wilcards: SAMPLE.loc[wilcards.sample, 'forward'],
+        reverse=lambda wilcards: SAMPLE.loc[wilcards.sample, 'reverse']
 
     output:
         fwd_paired='{sample}/{sample}_fwd_trimmed.fastq.gz',
