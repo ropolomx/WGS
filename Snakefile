@@ -172,4 +172,4 @@ rule pangenome:
     output:
         pan='roary/gene_presence_absence.csv'
     shell:
-        'roary -f roary -p 32 -t 11'
+        'roary -f roary -p 32 -t 11 {input}'
