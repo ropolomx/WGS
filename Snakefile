@@ -28,7 +28,7 @@ rule all:
         #'ecoh_summary.txt',
         'amr_summary.txt',
         'vf_summary.txt',
-        'plasmid_summary.txt'
+        'plasmid_summary.txt',
         'roary/gene_presence_absence.csv'
 
 rule shovill:
