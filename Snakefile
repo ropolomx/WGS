@@ -6,25 +6,25 @@ SAMPLE = pd.read_csv(config["samples"]).set_index("isolate", drop=False)
 
 rule all:
     input:
-        expand('{sample}/{sample}_prokka/{sample}.ffn', sample=SAMPLE),
-        expand('{sample}/{sample}_prokka/{sample}.faa', sample=SAMPLE),
-        expand('{sample}/{sample}_prokka/{sample}.fna', sample=SAMPLE),
-        expand('{sample}/{sample}_prokka/{sample}.fsa', sample=SAMPLE),
-        expand('{sample}/{sample}_prokka/{sample}.gbk', sample=SAMPLE),
-        expand('{sample}/{sample}_prokka/{sample}.gff', sample=SAMPLE),
-        expand('{sample}/{sample}_prokka/{sample}.sqn', sample=SAMPLE),
-        expand('{sample}/{sample}_prokka/{sample}.tbl', sample=SAMPLE),
-        expand('{sample}/{sample}_prokka/{sample}.tsv', sample=SAMPLE),
-        expand('{sample}/{sample}_prokka/{sample}.txt', sample=SAMPLE),
-        expand('{sample}/{sample}_prokka/{sample}.err', sample=SAMPLE),
-        expand('{sample}/{sample}_prokka/{sample}.log', sample=SAMPLE),
-        expand('{sample}/abricate_amr.txt', sample=SAMPLE),
-        expand('{sample}/abricate_plasmid.txt', sample=SAMPLE),
-        expand('{sample}/mlst.txt', sample=SAMPLE),
-        #expand('{sample}/abricate_ecoh.txt', sample=SAMPLE),
-        #expand('{sample}/abricate_ecolivf.txt', sample=SAMPLE),
-        #expand('{sample}/ariba_virfinder/assemblies.fa.gz', sample=SAMPLE),
-        #expand('{sample}/ariba_virfinder/report.tsv', sample=SAMPLE),
+        expand('{sample}/{sample}_prokka/{sample}.ffn', sample=SAMPLE.isolate),
+        expand('{sample}/{sample}_prokka/{sample}.faa', sample=SAMPLE.isolate),
+        expand('{sample}/{sample}_prokka/{sample}.fna', sample=SAMPLE.isolate),
+        expand('{sample}/{sample}_prokka/{sample}.fsa', sample=SAMPLE.isolate),
+        expand('{sample}/{sample}_prokka/{sample}.gbk', sample=SAMPLE.isolate),
+        expand('{sample}/{sample}_prokka/{sample}.gff', sample=SAMPLE.isolate),
+        expand('{sample}/{sample}_prokka/{sample}.sqn', sample=SAMPLE.isolate),
+        expand('{sample}/{sample}_prokka/{sample}.tbl', sample=SAMPLE.isolate),
+        expand('{sample}/{sample}_prokka/{sample}.tsv', sample=SAMPLE.isolate),
+        expand('{sample}/{sample}_prokka/{sample}.txt', sample=SAMPLE.isolate),
+        expand('{sample}/{sample}_prokka/{sample}.err', sample=SAMPLE.isolate),
+        expand('{sample}/{sample}_prokka/{sample}.log', sample=SAMPLE.isolate),
+        expand('{sample}/abricate_amr.txt', sample=SAMPLE.isolate),
+        expand('{sample}/abricate_plasmid.txt', sample=SAMPLE.isolate),
+        expand('{sample}/mlst.txt', sample=SAMPLE.isolate),
+        #expand('{sample}/abricate_ecoh.txt', sample=SAMPLE.isolate),
+        #expand('{sample}/abricate_ecolivf.txt', sample=SAMPLE.isolate),
+        #expand('{sample}/ariba_virfinder/assemblies.fa.gz', sample=SAMPLE.isolate),
+        #expand('{sample}/ariba_virfinder/report.tsv', sample=SAMPLE.isolate),
         #'ecoh_summary.txt',
         'amr_summary.txt',
         'vf_summary.txt',
@@ -36,8 +36,8 @@ rule trimmomatic:
         reverse=lambda wilcards: SAMPLE.loc[wilcards.sample, 'reverse']
 
     output:
-        fwd_paired='{sample}/{sample}_fwd_trimmed.fastq.gz',
-        rev_paired='{sample}/{sample}_rev_trimmed.fastq.gz'
+        fwd_paired='{sample}_fwd_trimmed.fastq.gz',
+        rev_paired='{sample}_rev_trimmed.fastq.gz'
 
     log:
         'logs/trimmomatic/{sample}.log'
