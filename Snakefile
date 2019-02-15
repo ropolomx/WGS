@@ -29,6 +29,7 @@ rule all:
         'amr_summary.txt',
         'vf_summary.txt',
         'plasmid_summary.txt'
+        'roary/gene_presence_absence.csv'
 
 rule shovill:
     input:
@@ -164,3 +165,11 @@ rule mlst:
         '{sample}/mlst.txt'
     shell:
         'mlst --threads 4 {input} > {output}'
+
+rule pangenome:
+    input:
+        'expand({sample}/prokka/{sample}.gff, sample=SAMPLE.isolate)'
+    output:
+        pan='roary/gene_presence_absence.csv'
+    shell:
+        'roary -f roary -p 32 -t 11'
