@@ -1,0 +1,21 @@
+{
+    "__default__" :
+    {
+        "partition" : "ExternalResearch",
+        "cpus-per-task": 4,
+        "memory" : "8GB"
+    },
+    "shovill" :
+    {
+        "cpus-per-task" : 32,
+        "memory" : "32GB"
+    },
+    "prokka" :
+    {
+        "cpus-per-task" : 32,
+        "memory" : "16GB"
+    }
+}
+
+
+
