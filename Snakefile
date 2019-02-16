@@ -27,7 +27,8 @@ rule all:
         'amr_summary.txt',
         'vf_summary.txt',
         'plasmid_summary.txt',
-        'roary/gene_presence_absence.csv'
+        'roary/gene_presence_absence.csv',
+        'core.aln'
 
 rule shovill:
     input:
@@ -183,4 +184,11 @@ rule snippy:
         outdir='{sample}/snippy'
     shell:
         'snippy --cpus 16 --outdir {params.outdir} --ref {input.ref} --R1 {input.forward} --R2 {input.reverse} --force'
-
+rule snipy_core:
+    input:
+        ref=REF,
+        snippy_dirs=expand('{sample}/snippy', sample=SAMPLE.isolate)
+    output:
+        'core.aln'
+    shell:
+        'snippy-core --ref {input.ref} {input.snippy_dirs}'
