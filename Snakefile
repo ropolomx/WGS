@@ -178,7 +178,7 @@ rule snippy:
         forward=lambda wildcards: SAMPLE.loc[wildcards.sample, 'forward'],
         reverse=lambda wildcards: SAMPLE.loc[wildcards.sample, 'reverse']
     output:
-        '{sample}/snps.vcf'
+        '{sample}/snippy/snps.vcf'
     params:
         outdir='{sample}/snippy'
     shell:
