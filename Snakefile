@@ -4,6 +4,8 @@ configfile: 'config.yaml'
 
 SAMPLE = pd.read_table(config["samples"]).set_index("isolate", drop=False)
 
+REF=config["ref"]
+
 rule all:
     input:
         expand('{sample}/prokka/{sample}.ffn', sample=SAMPLE['isolate']),
@@ -21,11 +23,7 @@ rule all:
         expand('{sample}/abricate_amr.txt', sample=SAMPLE['isolate']),
         expand('{sample}/abricate_plasmid.txt', sample=SAMPLE['isolate']),
         expand('{sample}/mlst.txt', sample=SAMPLE['isolate']),
-        #expand('{sample}/abricate_ecoh.txt', sample=SAMPLE['isolate']),
-        #expand('{sample}/abricate_ecolivf.txt', sample=SAMPLE['isolate']),
-        #expand('{sample}/ariba_virfinder/assemblies.fa.gz', sample=SAMPLE['isolate']),
-        #expand('{sample}/ariba_virfinder/report.tsv', sample=SAMPLE['isolate']),
-        #'ecoh_summary.txt',
+        expand('{sample}/snippy/snps.vcf', sample=SAMPLE['isolate']),
         'amr_summary.txt',
         'vf_summary.txt',
         'plasmid_summary.txt',
@@ -173,3 +171,16 @@ rule pangenome:
         pan='roary/gene_presence_absence.csv'
     shell:
         'roary -f roary -p 32 -t 11 {input}'
+
+rule snippy:
+    input:
+        ref=REF,
+        forward=lambda wildcards: SAMPLE.loc[wildcards.sample, 'forward'],
+        reverse=lambda wildcards: SAMPLE.loc[wildcards.sample, 'reverse']
+    output:
+        '{sample}/snps.vcf'
+    params:
+        outdir='{sample}/snippy'
+    shell:
+        'snippy --cpus 16 --outdir {params.outdir} --ref {input.ref} --R1 {input.forward} --R2 {input.reverse}
+
