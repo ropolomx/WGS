@@ -22,7 +22,7 @@
     },
     "snippy" :
     {
-        "cpus-per-task" : 16,
-        "memory": "32GB"
+        "cpus-per-task" : 32,
+        "memory": "8GB"
     }
 }
