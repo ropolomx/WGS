@@ -182,5 +182,5 @@ rule snippy:
     params:
         outdir='{sample}/snippy'
     shell:
-        'snippy --cpus 16 --outdir {params.outdir} --ref {input.ref} --R1 {input.forward} --R2 {input.reverse}'
+        'snippy --cpus 16 --outdir {params.outdir} --ref {input.ref} --R1 {input.forward} --R2 {input.reverse} --force'
 
