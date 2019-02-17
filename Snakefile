@@ -24,6 +24,7 @@ rule all:
         expand('{sample}/abricate_plasmid.txt', sample=SAMPLE['isolate']),
         expand('{sample}/mlst.txt', sample=SAMPLE['isolate']),
         expand('{sample}/snippy/snps.vcf', sample=SAMPLE['isolate']),
+        expand('{sample}/snps.vcf', sample=SAMPLE['isolate']),
         'amr_summary.txt',
         'vf_summary.txt',
         'plasmid_summary.txt',
@@ -186,10 +187,26 @@ rule snippy:
     shell:
         'snippy --cpus 16 --outdir {params.outdir} --ref {input.ref} --R1 {input.forward} --R2 {input.reverse} --force'
 
-rule snipy_core:
+rule move_snippy:
+    input:
+        '{sample}/snippy/*'
+    output:
+        '{sample}/snps.tab',
+        '{sample}/snps.aligned.fa',
+        '{sample}/snps.raw.vcf',
+        '{sample}/snps.vcf',
+        '{sample}/snps.bam',
+        '{sample}/snps.bam.bai',
+        '{sample}/snps.log'
+    params:
+        new_dir: '{sample}/'
+    shell:
+        'cp -r {input} {params.new_dir}'
+
+rule snippy_core:
     input:
         ref=REF,
-        snippy_dirs=expand('{sample}/snippy', sample=SAMPLE.isolate)
+        snippy_dirs=expand('{sample}', sample=SAMPLE.isolate)
     output:
         'core.aln'
     shell:
