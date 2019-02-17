@@ -199,7 +199,7 @@ rule move_snippy:
         '{sample}/snps.bam.bai',
         '{sample}/snps.log'
     params:
-        new_dir: '{sample}/'
+        new_dir= '{sample}/'
     shell:
         'cp -r {input} {params.new_dir}'
 
