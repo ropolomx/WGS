@@ -189,7 +189,13 @@ rule snippy:
 
 rule move_snippy:
     input:
-        '{sample}/snippy/*'
+        '{sample}/snippy/snps.tab',
+        '{sample}/snippy/snps.aligned.fa',
+        '{sample}/snippy/snps.raw.vcf',
+        '{sample}/snippy/snps.vcf',
+        '{sample}/snippy/snps.bam',
+        '{sample}/snippy/snps.bam.bai',
+        '{sample}/snippy/snps.log'
     output:
         '{sample}/snps.tab',
         '{sample}/snps.aligned.fa',
