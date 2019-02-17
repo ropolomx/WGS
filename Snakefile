@@ -28,7 +28,8 @@ rule all:
         'vf_summary.txt',
         'plasmid_summary.txt',
         'roary/gene_presence_absence.csv',
-        'core.aln'
+        'core.aln',
+        'distances.tab'
 
 rule shovill:
     input:
@@ -184,6 +185,7 @@ rule snippy:
         outdir='{sample}/snippy'
     shell:
         'snippy --cpus 16 --outdir {params.outdir} --ref {input.ref} --R1 {input.forward} --R2 {input.reverse} --force'
+
 rule snipy_core:
     input:
         ref=REF,
@@ -192,3 +194,11 @@ rule snipy_core:
         'core.aln'
     shell:
         'snippy-core --ref {input.ref} {input.snippy_dirs}'
+
+rule snp_distances:
+    input:
+        'core.aln'
+    output:
+        'distances.tab'
+    shell:
+        'snp-dists -b {input} > {output}'
