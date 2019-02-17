@@ -6,6 +6,8 @@ SAMPLE = pd.read_table(config["samples"]).set_index("isolate", drop=False)
 
 REF=config["ref"]
 
+ruleorder: move_snippy > snippy_core > snp_distances
+
 rule all:
     input:
         expand('{sample}/prokka/{sample}.ffn', sample=SAMPLE['isolate']),
