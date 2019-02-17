@@ -205,7 +205,7 @@ rule move_snippy:
         '{sample}/snps.bam.bai',
         '{sample}/snps.log'
     params:
-        new_dir = '{sample}/'
+        new_dir = '{sample}/',
         snippy_dir = '{sample}/snippy'
     shell:
         'cp {input} {params.new_dir}'
