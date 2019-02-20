@@ -1,2 +1,2 @@
-samples: samples.tab
+samples: correct_samples.tab
 ref: E_faecalis_ATCC29212.fasta

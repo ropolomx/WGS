@@ -6,7 +6,7 @@ SAMPLE = pd.read_table(config["samples"]).set_index("isolate", drop=False)
 
 REF=config["ref"]
 
-ruleorder: move_snippy > snippy_core > snp_distances
+#ruleorder: move_snippy > snippy_core > snp_distances
 
 rule all:
     input:
@@ -26,13 +26,15 @@ rule all:
         expand('{sample}/abricate_plasmid.txt', sample=SAMPLE['isolate']),
         expand('{sample}/mlst.txt', sample=SAMPLE['isolate']),
         expand('{sample}/snippy/snps.vcf', sample=SAMPLE['isolate']),
-        expand('{sample}/snps.vcf', sample=SAMPLE['isolate']),
+        #expand('{sample}/snps.vcf', sample=SAMPLE['isolate']),
         'amr_summary.txt',
         'vf_summary.txt',
         'plasmid_summary.txt',
         'roary/gene_presence_absence.csv',
         'core.aln',
-        'distances.tab'
+        'distances.tab',
+        'mlst_all.txt'
+	#'multiqc_report'
 
 rule shovill:
     input:
@@ -189,34 +191,34 @@ rule snippy:
     shell:
         'snippy --cpus 16 --outdir {params.outdir} --ref {input.ref} --R1 {input.forward} --R2 {input.reverse} --force'
 
-rule move_snippy:
-    input:
-        '{sample}/snippy/snps.tab',
-        '{sample}/snippy/snps.aligned.fa',
-        '{sample}/snippy/snps.raw.vcf',
-        '{sample}/snippy/snps.vcf',
-        '{sample}/snippy/snps.bam',
-        '{sample}/snippy/snps.bam.bai',
-        '{sample}/snippy/snps.log'
-    output:
-        '{sample}/snps.tab',
-        '{sample}/snps.aligned.fa',
-        '{sample}/snps.raw.vcf',
-        '{sample}/snps.vcf',
-        '{sample}/snps.bam',
-        '{sample}/snps.bam.bai',
-        '{sample}/snps.log'
-    params:
-        new_dir = '{sample}/',
-        snippy_dir = '{sample}/snippy'
-    shell:
-        'cp {input} {params.new_dir}'
-        #'rm -rf {params.snippy_dir}'
+#rule move_snippy:
+#    input:
+#        '{sample}/snippy/snps.tab',
+#        '{sample}/snippy/snps.aligned.fa',
+#        '{sample}/snippy/snps.raw.vcf',
+#        '{sample}/snippy/snps.vcf',
+#        '{sample}/snippy/snps.bam',
+#        '{sample}/snippy/snps.bam.bai',
+#        '{sample}/snippy/snps.log'
+#    output:
+#        '{sample}/snps.tab',
+#        '{sample}/snps.aligned.fa',
+#        '{sample}/snps.raw.vcf',
+#        '{sample}/snps.vcf',
+#        '{sample}/snps.bam',
+#        '{sample}/snps.bam.bai',
+#        '{sample}/snps.log'
+#    params:
+#        new_dir = '{sample}/',
+#        snippy_dir = '{sample}/snippy'
+#    shell:
+#        'cp {input} {params.new_dir}'
+#        #'rm -rf {params.snippy_dir}'
 
 rule snippy_core:
     input:
         ref=REF,
-        snippy_dirs=expand('{sample}', sample=SAMPLE.isolate)
+        snippy_dirs=expand('{sample}/snippy', sample=SAMPLE.isolate)
     output:
         'core.aln'
     shell:
@@ -229,3 +231,20 @@ rule snp_distances:
         'distances.tab'
     shell:
         'snp-dists -b {input} > {output}'
+
+rule combine_mlst:
+    input:
+        mlst_ref='mlst_ref.txt',
+        mlst_isolates=expand('{sample}/mlst.txt', sample=SAMPLE.isolate)
+    output:
+        'mlst_all.txt'
+    shell:
+        'cat {input.mlst_ref} {input.mlst_isolates} > {output}'
+
+#rule multiqc_prokka:
+#    input:
+#        expand('{sample}/prokka', sample=SAMPLE.isolate)
+#    output:
+#        'multiqc_report'
+#    shell:
+#        'multiqc -n {output} {input}'
