@@ -10,6 +10,7 @@ REF=config["ref"]
 
 rule all:
     input:
+        expand('{sample}/contigs.fa', sample=SAMPLE['isolate']),
         expand('{sample}/prokka/{sample}.ffn', sample=SAMPLE['isolate']),
         expand('{sample}/prokka/{sample}.faa', sample=SAMPLE['isolate']),
         expand('{sample}/prokka/{sample}.fna', sample=SAMPLE['isolate']),
