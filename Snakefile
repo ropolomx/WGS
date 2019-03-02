@@ -28,6 +28,7 @@ rule all:
         expand('{sample}/mlst.txt', sample=SAMPLE['isolate']),
         expand('{sample}/snippy/snps.vcf', sample=SAMPLE['isolate']),
         #expand('{sample}/snps.vcf', sample=SAMPLE['isolate']),
+        expand('{sample}/mob_suite/mobtyper_contigs.fa_report.txt', sample=SAMPLE['isolate']),
         'amr_summary.txt',
         'vf_summary.txt',
         'plasmid_summary.txt',
@@ -249,3 +250,13 @@ rule combine_mlst:
 #        'multiqc_report'
 #    shell:
 #        'multiqc -n {output} {input}'
+
+rule mob_suite:
+    input:
+        '{sample}/contigs.fa'
+    output:
+        '{sample}/mob_suite/mobtyper_contigs.fa_report.txt'
+    params:
+        dir='{sample}/mob_suite'
+    shell:
+       "mob_typer --infile {input} --outdir {params.dir}"
